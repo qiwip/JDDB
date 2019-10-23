@@ -53,7 +53,7 @@ class JTEXTDataExporter:
                              'tag list can\'t be Empty!')
         self.logger.info('Start download data')
         for shot in shots:
-            if len(self.reader.tags(shot)) == 0:
+            if len(self.reader.tags(shot)) != 0:
                 continue
             try:
                 c = connection.Connection('211.67.27.245')
