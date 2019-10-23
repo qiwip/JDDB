@@ -87,7 +87,9 @@ class Reader:
         TODO: fix bugs
         """
         try:
-            f = h5py.File(self.hdf5path + os.sep + '{}.hdf5'.format(shot), 'r')
+            path = str(math.floor(shot / 100) * 100)
+            file_path = self.hdf5path + os.sep + path + os.sep + '{}.hdf5'.format(shot)
+            f = h5py.File(file_path, 'r')
             return [i for i in f.__iter__()]
         except Exception as err:
             print('{}'.format(err))
