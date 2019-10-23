@@ -41,12 +41,8 @@ class Query:
             TqDuration          dtype:float       电流淬灭持续时间
         """
         result = self.col.find_one(
-            {'shot': '{}'.format(shot)}, {'_id': 0}
+            {'shot': shot}, {'_id': 0}
         )
-        if result is None:
-            return result
-        # if result['NoData'] is True or result['IsValidShot'] is False:
-        #     return None
 
         return result
 
@@ -74,10 +70,10 @@ class Query:
         result = self.col.find(
             filter, {'_id': 0}
         )
-        shot = []
+        shots = []
         for each in result:
-            shot.append(int(each['shot']))
-        return shot
+            shots.append(int(each['shot']))
+        return shots
 
 
 class Evaluator:

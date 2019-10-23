@@ -14,7 +14,10 @@ class GeneratorBase(object):
     #     """ Initialize self.  See help(type(self)) for accurate signature. """
     #     pass
     def requested_signal(self):
-        """ Return list of tag of signals that processor need"""
+        """ Return list of tag of signals that processor need
+        example:
+            return ['IP', 'OH']
+        """
         raise NotImplementedError('requested_signal')
 
     def run(self, data):
@@ -93,7 +96,10 @@ class TaskRunner:
                 for plugin in plugins:
                     plugin_name, plugin_path = plugin.popitem()
                     self.plugins[plugin_name] = importlib.import_module(plugin_path).Generator()
-                self.shots = config['shot']
+                if len(config['shot']) == 2:
+                    self.shots = range(config['shot'][0], config['shot'][1])
+                else:
+                    self.shots = config['shot']
                 self.hdf5_path = config['hdf5']
                 self.database = config['database']
         except FileNotFoundError as e:
@@ -104,11 +110,10 @@ class TaskRunner:
             self.logger.info('Load config success')
 
     def run(self):
-        shots = range(self.shots[0], self.shots[1])
         reader = Reader(self.hdf5_path)
         for plugin in self.plugins.values():
             signals = plugin.requested_signal()
-            for shot in shots:
+            for shot in self.shots:
                 try:
                     data = reader.read_many(shot=shot, tags=signals)
                     result = plugin.run(data)
@@ -121,9 +126,9 @@ class TaskRunner:
                     client = MongoClient(self.database['host'], self.database['port'])
                     db = client[self.database['database']]
                     col = db[self.database['collection']]
-
+                    result['shot'] = shot
                     col.update_one(
-                        {"shot": '{}'.format(shot)},
+                        {"shot": shot},
                         {"$set": result},
                         upsert=True
                     )

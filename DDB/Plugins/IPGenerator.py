@@ -35,14 +35,7 @@ class Generator(GeneratorBase):
             'RunawayIp': 0.0  # 逃逸电流大小
         }
         try:
-            # shot = data['shot']
-            ip_t = data[r'\ip']
-            # 二维数组
-            if ip_t.shape[0] == 2 and ip_t.shape[1] != 0:
-                ip = ip_t[0]
-                time = ip_t[1]
-            else:
-                return {}
+            ip, time = data[r'\ip']
             start = np.where(time >= 0)[0][0]
             end = np.where(time >= 1)[0][0]
             ip = ip[start:end]

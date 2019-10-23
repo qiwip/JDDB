@@ -1,15 +1,14 @@
 """
 分析磁探针信号，获取锁模信息
+这个需要优化，不应该依赖其他标签
 ==========
 算法:
 
 """
 from DDB.Label import GeneratorBase
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy import signal
-import os
-from core.database import DisruptionDataBase
+from DDB.Service import Query
 
 
 class LockedMode(GeneratorBase):
@@ -17,16 +16,13 @@ class LockedMode(GeneratorBase):
     def __init__(self):
         pass
 
-    def device(self):
-        return 'J-TEXT'
-
-    def get_request_signal(self):
+    def requested_signal(self):
         return [r'\MA_POL_CA01T',
                 r'\exsad1', r'\exsad2', r'\exsad3', r'\exsad4', r'\exsad5',
                 r'\exsad6', r'\exsad7', r'\exsad8', r'\exsad9', r'\exsad10'
                 ]
 
-    def calculate(self, data):
+    def run(self, data):
         result = {
             'IsLockedMode': False,  # 是否发生锁模
             'LockedModeTime': 0.0  # 锁模时间
@@ -35,7 +31,7 @@ class LockedMode(GeneratorBase):
         }
 
         shot = data['shot']
-        db = DisruptionDataBase()
+        db = Query()
         tag = db.tag(shot)
 
         if tag['IsRampUpDisrupt'] is True:

@@ -139,7 +139,7 @@ class Reader:
                 time_axis = []
                 for i in range(data.shape[0]):
                     time_axis.append(st + i * (1 / fs))
-                data_dict[tag] = np.array([data, np.array(time_axis)])
+                data_dict[tag] = (np.array(data), np.array(time_axis))
 
         f.close()
         return data_dict

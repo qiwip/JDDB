@@ -1,7 +1,7 @@
 """
-分析等离子体电流，获取等离子体电流相关的信息
+分析扰动场设置，找到是否投入扰动场
 ==========
-通过滤波算法找到等离子体平顶电流大小，开始下降时间等信息
+
 
 """
 from DDB.Label import GeneratorBase
@@ -10,29 +10,19 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 
-class PF(GeneratorBase):
+class PerturbationField(GeneratorBase):
 
     def __init__(self):
         pass
 
-    def device(self):
-        return 'J-TEXT'
-
-    def get_request_signal(self):
+    def requested_signal(self):
         return [r'\DRMP_DC_Io2']
 
-    def calculate(self, data):
+    def run(self, data):
         result = {
 
         }
-        pf_t = data[r'\DRMP_DC_Io2']
-        if pf_t.shape[0] == 2 and pf_t.shape[1] != 0:
-            pf = pf_t[0]
-            time = pf_t[1]
-        else:
-            result['NoData'] = True
-            return result
-
+        pf, time = data[r'\DRMP_DC_Io2']
         start = np.where(time > 0)[0][0]
         end = np.where(time > 0.8)[0][0]
         pf = pf[start:end]
