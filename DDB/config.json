@@ -1,6 +1,6 @@
 {
     "plugins": [
-        {"IP": "Plugins.IPGenerator"}
+        {"IP": "DDB.Plugins.IPGenerator"}
     ],
     "shot": [1045962, 1064014],
     "hdf5": "/nas/hdf5",

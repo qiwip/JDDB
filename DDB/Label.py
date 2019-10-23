@@ -106,6 +106,7 @@ class TaskRunner:
             self.logger.info('{}'.format(e))
         except Exception as e:
             self.logger.info('配置文件{}格式错误,{}'.format(config_path, e))
+            exit(-1)
         else:
             self.logger.info('Load config success')
 
