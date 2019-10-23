@@ -5,6 +5,9 @@ from scipy import signal
 import logging
 import platform
 import traceback
+import os
+import time
+import json
 
 
 class JTEXTDataExporter:
@@ -19,9 +22,13 @@ class JTEXTDataExporter:
             self.hdf5path = root
         self.importer = Exporter(self.hdf5path)
         # log
+        log_dir = os.path.abspath('.') + os.sep + 'log'
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(level=logging.INFO)
-        handler = logging.FileHandler('log.txt')
+        handler = logging.FileHandler(log_dir + os.sep + 'JTEXTDataExporter_log_{}.txt'.format(
+            time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))))
         handler.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
@@ -85,7 +92,11 @@ class JTEXTDataExporter:
 
 
 if __name__ == '__main__':
-    shots = [i for i in range(1059733, 1059734)]
-    tags = [r'\ip', r'\bt']
-    jdi = JTEXTDataExporter('F:\\hdf5')
-    jdi.download(shots, tags)
+    config_path = os.path.abspath('.') + os.sep + 'DDB' + os.sep + 'config.json'
+    with open(config_path, 'r') as f:
+        config = json.load(f)
+        shots = range(config['shot'][0], config['shot'][1])
+        hdf5_path = config['hdf5']
+        tags = [r'\ip', r'\bt']
+        jdi = JTEXTDataExporter(hdf5_path)
+        jdi.download(shots, tags)
