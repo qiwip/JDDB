@@ -2,7 +2,7 @@
     "plugins": [
         {"IP": "Plugins.IPGenerator"}
     ],
-    "shot": [1052797, 1064014],
+    "shot": [1045962, 1064014],
     "hdf5": "/nas/hdf5",
     "database": {
         "type": "mongodb",
