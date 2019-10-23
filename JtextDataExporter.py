@@ -1,4 +1,4 @@
-from DDB.Data import Exporter
+from DDB.Data import Exporter, Reader
 from MDSplus import connection
 import numpy as np
 from scipy import signal
@@ -20,7 +20,8 @@ class JTEXTDataExporter:
         """connect to mdsplus server and init data importer"""
         if root:
             self.hdf5path = root
-        self.importer = Exporter(self.hdf5path)
+        self.exporter = Exporter(self.hdf5path)
+        self.reader = Reader(self.hdf5path)
         # log
         log_dir = os.path.abspath('.') + os.sep + 'log'
         if not os.path.exists(log_dir):
@@ -52,6 +53,8 @@ class JTEXTDataExporter:
                              'tag list can\'t be Empty!')
         self.logger.info('Start download data')
         for shot in shots:
+            if len(self.reader.tags(shot)) == 0:
+                continue
             try:
                 c = connection.Connection('211.67.27.245')
                 c.openTree('jtext', shot=shot)
@@ -78,11 +81,12 @@ class JTEXTDataExporter:
                                 time = []
                                 for i in range(num):
                                     time.append(i*duration)
-                            self.importer.save(data, time, shot, tag)
+                            self.exporter.save(data, time, shot, tag)
                             self.logger.info('shot:{}, tag:{}, Finish.'.format(shot, tag))
                     except Exception as e:
                         self.logger.info('shot:{}, tag:{}, error occurs:{}\n{}.'.
                                          format(shot, tag, e, traceback.format_exc()))
+                        self.exporter.save([], [], shot, tag)
                 c.closeTree('jtext', shot=shot)
             except Exception as err:
                 self.logger.info('shot {} is Empty, reason: {}\n{}'.format(shot, err, traceback.format_exc()))
