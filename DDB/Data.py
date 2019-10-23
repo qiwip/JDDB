@@ -51,11 +51,11 @@ class Exporter:
             traceback.print_exc(e)
             os.remove(file_path)
             h5f = h5py.File(file_path)
-        fs = len(data) / (time[-1] - time[0])
-
+        fs = len(data) / (time[-1] - time[0]) if len(time) > 1 else 0
+        start_time = time[0] if len(time) > 1 else 0
         dataset = h5f.create_dataset('/{}'.format(tag), data=data)
         dataset.attrs.create('SampleRate', fs)
-        dataset.attrs.create('StartTime', time[0])
+        dataset.attrs.create('StartTime', start_time)
 
 
 class Reader:
