@@ -1,0 +1,18 @@
+{
+    "plugins": [
+        {"IP": "Plugins.IPGenerator"}
+    ],
+    "shot": [1052797, 1064014],
+    "hdf5": "/nas/hdf5",
+    "database": {
+        "type": "mongodb",
+        "host": "127.0.0.1",
+        "port": 8017,
+        "database": "DDB",
+        "collection": "tags"
+    },
+    "thread": 1,
+    "slave": false,
+    "host": "",
+    "port": ""
+}
