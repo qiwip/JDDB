@@ -26,8 +26,8 @@ class ECE(GeneratorBase):
 
     def run(self, data):
         result = {
-            'TqTime': 0.0,  # 电流淬灭时间
-            'TqDuration': 0.0,  # 电流淬灭持续时间
+            'TqTime': 0.0,  #
+            'TqDuration': 0.0,  # 
         }
         try:
             bt, time = data['\Bt']

@@ -82,6 +82,8 @@ class Evaluator:
 
 if __name__ == '__main__':
     db = Query()
-    my_query = {'NoData': False, 'IsValidShot': True}
-    tag = db.tag(1059733)
-    print(tag['RampDownTime'])
+    my_query = {'IsValidShot': True}
+    shots = db.query(my_query)
+    print(len(shots))
+    # tag = db.tag(1045985)
+    # print(tag)
