@@ -115,6 +115,8 @@ class TaskRunner:
         for plugin in self.plugins.values():
             signals = plugin.requested_signal()
             for shot in self.shots:
+                self.logger.info('Run module {} @shot {}.\n'.format(
+                    plugin.__class__.__name__, shot))
                 try:
                     data = reader.read_many(shot=shot, tags=signals)
                     result = plugin.run(data)
