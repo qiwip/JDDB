@@ -46,12 +46,12 @@ class Generator(GeneratorBase):
             ks = ks.reshape(ks.shape[0] * ks.shape[1])
             start = 0
 
-            if ks.min() < -2000:
+            if ks.min() < -10000 and ip[ks < -10000][0] > 100:
                 result['IsDisrupt'] = True
                 for index in range(ks.shape[0]):
-                    if ks[index] < -2000 and start == 0:
+                    if ks[index] < -10000 and start == 0:
                         start = time[index]
-                    elif ks[index] > -2000 and start != 0:
+                    elif ks[index] > -10000 and start != 0:
                         result['CqDuration'] = time[index] - start
                         result['CqTime'] = start
                         return result
@@ -61,10 +61,10 @@ class Generator(GeneratorBase):
                     if ks[index] < 0 and start == 0:
                         start = time[index]
                         count += 1
-                    elif ks[index] > 0 and count < 1000:
+                    elif ks[index] > 0 and count < 300:
                         start = -1
                         count = 0
-                    elif ks[index] > 0 and count >= 1000:
+                    elif ks[index] > 0 and count >= 300:
                         # end = time[index]
                         result['RampDownTime'] = start
                         return result
