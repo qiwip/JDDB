@@ -62,7 +62,7 @@ class Generator(GeneratorBase):
                         start = time[index]
                         count += 1
                     elif ks[index] > 0 and count < 300:
-                        start = -1
+                        start = 0
                         count = 0
                     elif ks[index] > 0 and count >= 300:
                         # end = time[index]
