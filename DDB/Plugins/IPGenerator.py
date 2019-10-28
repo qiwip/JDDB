@@ -56,7 +56,7 @@ class Generator(GeneratorBase):
                     result['IsDisrupt'] = True
                     while end > start:
                         k = np.polyfit(time[end - 10:end], ip[end - 10:end], 1)[0]
-                        if k > -1000:
+                        if k > -1000 and ip[end] > ip[start]*0.9:
                             break
                         end -= 1
                     result['CqTime'] = time[end]
