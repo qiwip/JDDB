@@ -62,7 +62,8 @@ class Generator(GeneratorBase):
                     result['CqTime'] = time[end]
                 else:
                     result['RampDownTime'] = time[start]
-            result['IsValidShot'] = False
+            else:
+                result['IsValidShot'] = False
             return result
         except Exception as e:
             print(e)
