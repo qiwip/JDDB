@@ -30,46 +30,38 @@ class Generator(GeneratorBase):
             ip, time = data[r'\ip']
             ip = ip[(time >= 0) & (time <= 1)]
             time = time[(time >= 0) & (time <= 1)]
+            # 低通滤波
+            ba = signal.butter(8, 0.04, 'lowpass')
+            ip_ = signal.filtfilt(ba[0], ba[1], ip)
+            # 中值滤波
             ip = signal.medfilt(ip, 15)
-            # 在0.03s没爬到50kA认为不是有效炮
+            # 在0.05s没到50kA认为不是有效炮
             if ip[time >= 0.05][0] < 50:
                 result['IsValidShot'] = False
                 return result
-            # 0.03到0.05s为电流爬升阶段
             result['IpFlat'] = ip.max()
-            ks = []
-            window = 20
-            for s in range(0, len(ip), window):
-                k = np.polyfit(time[s:s + window], ip[s:s + window], 1)[0]
-                ks.append([k for j in range(window)])
-            ks = np.array(ks)
-            ks = ks.reshape(ks.shape[0] * ks.shape[1])
             start = 0
-
-            if ks.min() < -10000 and ip[ks < -10000][0] > 100:
-                result['IsDisrupt'] = True
-                for index in range(ks.shape[0]):
-                    if ks[index] < -10000 and start == 0:
-                        start = time[index]
-                    elif ks[index] > -10000 and start != 0:
-                        result['CqDuration'] = time[index] - start
-                        result['CqTime'] = start
-                        return result
-            else:
-                count = 0
-                for index in range(ks.shape[0]):
-                    if ks[index] < 0 and start == 0:
-                        start = time[index]
-                        count += 1
-                    elif ks[index] > 0 and count < 300:
-                        start = 0
-                        count = 0
-                    elif ks[index] > 0 and count >= 300:
-                        # end = time[index]
-                        result['RampDownTime'] = start
-                        return result
-                    else:
-                        count += 1
+            end = 0
+            for i in range(len(ip_ - 640)):
+                if ip_[i] > ip_[i + 20] > ip_[i + 40] and ip_[i] * 0.92 > ip_[i + 160] and ip_[i] * 0.9 > ip_[i + 320] \
+                        and ip_[i] * 0.8 > ip_[i + 640]:
+                    start = i
+                    break
+            for i in range(start, len(ip_ - 640)):
+                if ip_[i] <= 10:
+                    end = i
+                    break
+            if start and end:
+                if end - start < 600:
+                    result['IsDisrupt'] = True
+                    while end > start:
+                        k = np.polyfit(time[end - 10:end], ip[end - 10:end], 1)[0]
+                        if k > -1000:
+                            break
+                        end -= 1
+                    result['CqTime'] = time[end]
+                else:
+                    result['RampDownTime'] = time[start]
             result['IsValidShot'] = False
             return result
         except Exception as e:
