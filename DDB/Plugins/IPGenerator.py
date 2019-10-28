@@ -43,7 +43,7 @@ class Generator(GeneratorBase):
             start = 0
             end = 0
             for i in range(len(ip_ - 640)):
-                if ip_[i] > ip_[i + 20] > ip_[i + 40] and ip_[i] * 0.92 > ip_[i + 160] and ip_[i] * 0.9 > ip_[i + 320] \
+                if ip_[i] > ip_[i + 20] > ip_[i + 40] and ip_[i] * 0.95 > ip_[i + 160] and ip_[i] * 0.9 > ip_[i + 320] \
                         and ip_[i] * 0.8 > ip_[i + 640]:
                     start = i
                     break
