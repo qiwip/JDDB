@@ -36,7 +36,7 @@ class Generator(GeneratorBase):
             # 中值滤波
             ip = signal.medfilt(ip, 15)
             # 在0.05s没到50kA认为不是有效炮
-            if ip[time >= 0.05][0] < 100:
+            if ip[time >= 0.05][0] < 80:
                 result['IsValidShot'] = False
                 return result
             result['IpFlat'] = ip.max()
