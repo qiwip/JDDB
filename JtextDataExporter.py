@@ -53,8 +53,6 @@ class JTEXTDataExporter:
                              'tag list can\'t be Empty!')
         self.logger.info('Start download data')
         for shot in shots:
-            if len(self.reader.tags(shot)) != 0:
-                continue
             try:
                 c = connection.Connection('211.67.27.245')
                 c.openTree('jtext', shot=shot)
@@ -96,11 +94,10 @@ class JTEXTDataExporter:
 
 
 if __name__ == '__main__':
-    config_path = os.path.abspath('.') + os.sep + 'DDB' + os.sep + 'config.json'
-    with open(config_path, 'r') as f:
-        config = json.load(f)
-        shots = range(config['shot'][0], config['shot'][1])
-        hdf5_path = config['hdf5']
-        tags = [r'\ip', r'\bt']
-        jdi = JTEXTDataExporter(hdf5_path)
-        jdi.download(shots, tags)
+    shots = []
+    with open('shots.txt', 'r') as f:
+        for i in f.readlines():
+            shots.append(int(i))
+    tags = [r'\Bt', r'\Ihfp', r'\Ivfp', r'\MA_POL_CA01T', r'\MA_POL_CA02T', r'\MA_POL_CA03T', r'\MA_POL_CA05T', r'\MA_POL_CA06T', r'\MA_POL_CA07T', r'\MA_POL_CA19T', r'\MA_POL_CA20T', r'\MA_POL_CA21T', r'\MA_POL_CA22T', r'\MA_POL_CA23T', r'\MA_POL_CA24T', r'\axuv_ca_01', r'\ip', r'\sxr_cb_024', r'\sxr_cc_049', r'\vs_c3_aa001', r'\vs_ha_aa001']
+    jdi = JTEXTDataExporter()
+    jdi.download(shots, tags)

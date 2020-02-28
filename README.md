@@ -1,5 +1,5 @@
 
-# Disruption database设计文档
+# 破裂数据库(Disruption database)说明
 
 ## 包结构
 
@@ -44,24 +44,24 @@ def run(data):
 
 自动调用各种生成标签的插件去生成一些标签。以前是通过在程序里```add(插件类())```的方式添加，现在改为配置文件配置。
 
-```json
-{
-    "plugins": [
-        {"IP": "Plugins.IPGenerator"},
-        {"BT": "Plugins.Bt"}
-    ],
-    "shot": [1052345, 1062345],
-    "hdf5": "F:\\J-TEXT",
-    "db": {
-        "type": "mongodb",
-        "host": "localhost",
-        "port": 27017
-    },
-    "thread": 1,
-    "slave": false,
-    "host": "",
-    "port": ""
-}
+```bash
+[plugins]
+ip = DDB.Plugins.IPGenerator
+
+[shot]
+start = 1064034
+end = 1064648
+
+[path]
+hdf5 = D:\jtext\HDF5
+
+[output]
+type = mongodb
+host = www.jtext.cn
+port = 14617
+database = DDB
+collection = tags2019
+
 ```
 
 在初始化的时候，读取配置文件，再import配置里面给的包名，调用其接口进行计算。

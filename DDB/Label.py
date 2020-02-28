@@ -1,5 +1,5 @@
 import os
-import json
+import DDB
 import time
 import logging
 import importlib
@@ -66,16 +66,15 @@ class TaskRunner:
 
         """
 
-    def __init__(self, config_path):
+    def __init__(self):
         """
-        从配置文件中初始化TaskRunner
-        :param config_path: json or dict
+        初始化TaskRunner,从配置文件中加载设置
         """
         log_dir = os.path.abspath('.') + os.sep + 'log'
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
-        # 创建handler，用于写入日志文件和控制台
+        # log handler
         fh = logging.FileHandler(log_dir + os.sep + 'TaskRunner_log_{}.txt'.format(
             time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))))
         ch = logging.StreamHandler()
@@ -87,25 +86,23 @@ class TaskRunner:
         self.logger.setLevel(logging.INFO)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
-        # load config
+        # Load config
+        config = DDB.get_config()
         try:
-            with open(config_path, 'r') as f:
-                config = json.load(f)
-                plugins = config['plugins']
-                self.plugins = {}
-                for plugin in plugins:
-                    plugin_name, plugin_path = plugin.popitem()
-                    self.plugins[plugin_name] = importlib.import_module(plugin_path).Generator()
-                if len(config['shot']) == 2:
-                    self.shots = range(config['shot'][0], config['shot'][1])
-                else:
-                    self.shots = config['shot']
-                self.hdf5_path = config['hdf5']
-                self.database = config['database']
+            plugins = config['plugins']
+            self.plugins = {}
+            for item in plugins:
+                plugin_path = plugins[item]
+                print(item, plugin_path)
+                self.plugins[item] = importlib.import_module(plugin_path).Generator()
+
+            self.shots = range(int(config['shot']['start']), int(config['shot']['end']))
+            self.hdf5_path = config['path']['hdf5']
+            self.output = config['output']
         except FileNotFoundError as e:
             self.logger.info('{}'.format(e))
         except Exception as e:
-            self.logger.info('配置文件{}格式错误,{}'.format(config_path, e))
+            self.logger.info('配置文件错误{}'.format(e))
             exit(-1)
         else:
             self.logger.info('Load config success')
@@ -124,18 +121,18 @@ class TaskRunner:
                     self.logger.info('An error occurs in module {} @shot {}.\n{}\n{}'.format(
                         plugin.__class__.__name__, shot, e, traceback.format_exc()))
                     result = {}
-                if self.database['type'] == "mongodb":
+                if self.output['type'] == "mongodb":
                     from pymongo import MongoClient
-                    client = MongoClient(self.database['host'], self.database['port'])
-                    db = client[self.database['database']]
-                    col = db[self.database['collection']]
+                    client = MongoClient(self.output['host'], int(self.output['port']))
+                    db = client[self.output['database']]
+                    col = db[self.output['collection']]
                     result['shot'] = shot
                     col.update_one(
                         {"shot": shot},
                         {"$set": result},
                         upsert=True
                     )
-                elif self.database['type'] == "stdio":
+                elif self.output['type'] == "stdio":
                     print(result)
                 else:
-                    raise RuntimeError('配置文件db选项不正确,可选为:mongodb,stdio')
+                    raise RuntimeError('配置文件output type选项不正确,可选为:mongodb,stdio')

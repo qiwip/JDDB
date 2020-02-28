@@ -3,6 +3,7 @@ import h5py
 import math
 import numpy as np
 import traceback
+import DDB
 
 
 class Exporter:
@@ -15,8 +16,12 @@ class Exporter:
     >>> time = [0, 0.1, 0.2, 0.3, 0.4]
     >>> exporter.save(data, time, 1051234, '\\ip')
     """
-    def __init__(self, root_path='.'):
-        self.hdf5path = root_path
+    def __init__(self, root_path=None):
+        if root_path:
+            self.hdf5path = root_path
+        else:
+            config = DDB.get_config()
+            self.hdf5path = config['path']['hdf5']
         if not os.path.exists(self.hdf5path):
             os.mkdir(self.hdf5path)
 
@@ -54,8 +59,8 @@ class Exporter:
         fs = len(data) / (time[-1] - time[0]) if len(time) > 1 else 0
         start_time = time[0] if len(time) > 1 else 0
         dataset = h5f.create_dataset('/{}'.format(tag), data=data)
-        dataset.attrs.create('SampleRate', fs)
-        dataset.attrs.create('StartTime', start_time)
+        dataset.attrs.work('SampleRate', fs)
+        dataset.attrs.work('StartTime', start_time)
 
 
 class Reader:
@@ -73,9 +78,12 @@ class Reader:
     >>> data_dict = reader.read_many(1054342, tags)
     >>> ip, ip_time = data_dict['\\ip']
     """
-    def __init__(self, root_path='.'):
-        self.hdf5path = root_path
-        print(root_path)
+    def __init__(self, root_path=None):
+        if root_path:
+            self.hdf5path = root_path
+        else:
+            config = DDB.get_config()
+            self.hdf5path = config['path']['hdf5']
         if not os.path.exists(self.hdf5path):
             raise ValueError('Path {} does n\'t exist.')
 

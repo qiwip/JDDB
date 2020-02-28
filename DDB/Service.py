@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import DDB
 
 
 class Query:
@@ -13,10 +14,12 @@ class Query:
         [1046770, 1046794, 1046795, 1046806, 1046800, 1046809, 1046826, 1046828, 1046832, 1046835, 1046858,..., 1049184, 1050467, 1052286, 1050560, 1052295]
     """
 
-    def __init__(self, host='211.67.27.245', port=14617):
-        self.client = MongoClient(host, port)
-        self.db = self.client['DDB']
-        self.col = self.db['tags']
+    def __init__(self):
+        config = DDB.get_config()
+        database = config['output']
+        self.client = MongoClient(database['host'], int(database['port']))
+        self.db = self.client[database['database']]
+        self.col = self.db[database['collection']]
 
     def tag(self, shot):
         """
@@ -87,6 +90,6 @@ if __name__ == '__main__':
     my_query = {'IsValidShot': True}
     shots = db.query(my_query)
     print(shots)
-    # print(len(shots))
+    print(len(shots))
     # tag = db.tag(1059767)
     # print(tag)
