@@ -23,7 +23,7 @@ class JTEXTDataExporter:
         self.exporter = Exporter(self.hdf5path)
         self.reader = Reader(self.hdf5path)
         # log
-        log_dir = os.path.abspath('.') + os.sep + 'log'
+        log_dir = os.path.abspath('..') + os.sep + 'log'
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         self.logger = logging.getLogger(__name__)
