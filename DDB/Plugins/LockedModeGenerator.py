@@ -11,7 +11,7 @@ from scipy import signal
 from DDB.Service import Query
 
 
-class LockedMode(GeneratorBase):
+class Generator(GeneratorBase):
 
     def __init__(self):
         pass

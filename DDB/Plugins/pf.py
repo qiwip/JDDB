@@ -10,7 +10,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 
-class PerturbationField(GeneratorBase):
+class Generator(GeneratorBase):
 
     def __init__(self):
         pass

@@ -9,7 +9,7 @@ import numpy as np
 from scipy import signal as signal
 
 
-class ECE(GeneratorBase):
+class Generator(GeneratorBase):
 
     def __init__(self):
         pass

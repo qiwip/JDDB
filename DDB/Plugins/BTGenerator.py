@@ -8,7 +8,7 @@ from DDB.Label import GeneratorBase
 import numpy as np
 
 
-class Bt(GeneratorBase):
+class Generator(GeneratorBase):
 
     def __init__(self):
         pass

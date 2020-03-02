@@ -6,7 +6,7 @@ class Query:
     """
     查询J-TEXT破裂数据库的内容
     For example:
-    >>> db = Query()   # 默认host='211.67.27.7', port=27071
+    >>> db = Query()
     >>> db.tag(1046810)
         {'shot': '1046810', 'CqDuration': 0.0, 'CqTime': 0.0, 'IpCq': 0.0, 'IpFlat': 202.8784696689742, 'IsDisrupt': False, 'IsFlatTopDisrupt': False, 'IsRampDownDisrupt': False, 'IsRampUpDisrupt': False, 'IsRunaway': False, 'IsValidShot': True, 'NoData': False, 'RampDownTime': 0.48910004768371573, 'RunawayDuration': 0.0, 'RunawayIp': 0.0, 'TqDuration': 0.0, 'TqTime': 0.0}
     >>> my_query = {'IsDisrupt': True, 'IpFlat':{'$gt':50}}

@@ -88,7 +88,7 @@ class Reader:
             raise ValueError('Path {} does n\'t exist.')
 
     def tags(self, shot=None):
-        """get tag of a shot
+        """get tags of a shot
         @:param shot: Shot number, integer
         @:return:Tags of Diagnostic signal
 
