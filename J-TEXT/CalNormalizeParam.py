@@ -24,25 +24,28 @@ for tag in tags:
     result = {'max': None, 'min': None}
     sample = random.sample(shots, 50)
     for shot in sample:
-        dig, time = reader.read_one(shot, tag)
-        # 低通滤波
-        ba = signal.butter(8, 0.04, 'lowpass')
-        ip_ = signal.filtfilt(ba[0], ba[1], dig)
-        # 中值滤波
-        dig = signal.medfilt(dig, 15)
-        info = ddb.tag(shot)
-        if info['IsDisrupt']:
-            t1 = info['CqTime']
-        else:
-            t1 = info['RampDownTime']
-        dig = dig[(0.05 <= time) & (time <= t1)]
-        if result['max'] is None:
-            result['max'] = max(dig)
-            result['min'] = min(dig)
-        if result['max'] < max(dig):
-            result['max'] = max(dig)
-        if result['min'] > min(dig):
-            result['min'] = min(dig)
+        try:
+            dig, time = reader.read_one(shot, tag)
+            # 低通滤波
+            ba = signal.butter(8, 0.04, 'lowpass')
+            ip_ = signal.filtfilt(ba[0], ba[1], dig)
+            # 中值滤波
+            dig = signal.medfilt(dig, 15)
+            info = ddb.tag(shot)
+            if info['IsDisrupt']:
+                t1 = info['CqTime']
+            else:
+                t1 = info['RampDownTime']
+            dig = dig[(0.05 <= time) & (time <= t1)]
+            if result['max'] is None:
+                result['max'] = max(dig)
+                result['min'] = min(dig)
+            if result['max'] < max(dig):
+                result['max'] = max(dig)
+            if result['min'] > min(dig):
+                result['min'] = min(dig)
+        except Exception as e:
+            print(e)
     param.update_one(
                 {"tag": tag},
                 {"$set": result},
