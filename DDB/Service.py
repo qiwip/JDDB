@@ -19,7 +19,8 @@ class Query:
         database = config['output']
         self.client = MongoClient(database['host'], int(database['port']))
         self.db = self.client[database['database']]
-        self.col = self.db[database['collection']]
+        self.tags = self.db[database['collection']]
+        self.param = self.db[database['collection']+'归一化参数']
 
     def tag(self, shot):
         """
@@ -43,10 +44,18 @@ class Query:
             TqTime              dtype:float       电流淬灭时间
             TqDuration          dtype:float       电流淬灭持续时间
         """
-        result = self.col.find_one(
+        result = self.tags.find_one(
             {'shot': shot}, {'_id': 0}
         )
 
+        return result
+
+    def get_normalize_parm(self, tags):
+        result = dict()
+        for tag in tags:
+            result[tag] = self.param.find_one(
+                {'tag': tag}, {'_id': 0}
+            )
         return result
 
     def query(self, filter=None):
@@ -70,7 +79,7 @@ class Query:
         """
         if filter is None:
             filter = {}
-        result = self.col.find(
+        result = self.tags.find(
             filter, {'_id': 0}
         )
         shots = []
