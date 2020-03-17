@@ -19,6 +19,8 @@ class Query:
         database = config['output']
         self.client = MongoClient(database['host'], int(database['port']))
         self.db = self.client[database['database']]
+        if config.has_option('output', 'username'):
+            self.db.authenticate(config.get('output', 'username'), config.get('output', 'password'))
         self.tags = self.db[database['collection']]
         self.param = self.db[database['collection']+'归一化参数']
 

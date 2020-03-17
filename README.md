@@ -24,6 +24,44 @@ DDB
 
 > 程序包中还包含了J-TEXT读取数据的程序`JtextDataImporter.py`
 
+## 项目配置
+### python环境
+
+本项目使用python 3.x开发, 推荐使用Anaconda. 项目依赖hdf5和MongoDB的python包, 使用如下命令安装:
+
+```shell script
+pip install pyh5
+pip install pymongo
+```
+
+### MongoDB
+
+项目中生成的标签可以存储到MongoDB数据库, 因此使用MongoDB存储时需要配置MongoDB Server, 为了数据安全, 推荐启用MongoDB的认证.
+
+步骤为:
+* 新建MongoDB Server管理用户
+* 新建DDB用户
+* 修改配置文件,启用认证,重启MongoDB服务
+```shell script
+root# mongo
+> use admin
+> db.createUser({user: "DDBAdmin",pwd: "admin",roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase"]})
+> use <数据库名>
+> db.createUser({user: "DDBUser",pwd: "tokamak!",roles: ["dbOwner"]})
+> exit
+```
+修改配置文件```/etc/mongod.conf```:
+```text
+security:
+  authorization: enabled
+```
+
+重启服务
+
+```shell script
+root# service mongod restart
+```
+
 ## Label
 
 ### 1. GeneratorBase
@@ -64,7 +102,7 @@ class Generator(GeneratorBase):
 ```
 ### 2. TaskRunner
 
-自动调用各种生成标签的插件去生成一些标签.以前是通过在程序里```add(插件类())```的方式添加,现在改为配置文件配置.
+自动调用各种生成标签的插件去生成一些标签. 调用的插件、计算炮号范围和输出通过配置文件配置. 其中,插件在[plugins]下添加, 格式为<模块名>=<模块import路径>
 
 ```bash
 [plugins]

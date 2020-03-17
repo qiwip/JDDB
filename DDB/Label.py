@@ -87,18 +87,19 @@ class TaskRunner:
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
         # Load config
-        config = DDB.get_config()
+        self.config = DDB.get_config()
+
         try:
-            plugins = config['plugins']
+            plugins_conf = self.config['plugins']
             self.plugins = {}
-            for item in plugins:
-                plugin_path = plugins[item]
+            for item in plugins_conf:
+                plugin_path = plugins_conf[item]
                 print(item, plugin_path)
                 self.plugins[item] = importlib.import_module(plugin_path).Generator()
 
-            self.shots = range(int(config['shot']['start']), int(config['shot']['end']))
-            self.hdf5_path = config['path']['hdf5']
-            self.output = config['output']
+            self.shots = range(int(self.config['shot']['start']), int(self.config['shot']['end']))
+            self.hdf5_path = self.config['path']['hdf5']
+            self.output = self.config['output']
         except FileNotFoundError as e:
             self.logger.info('{}'.format(e))
         except Exception as e:
@@ -124,7 +125,10 @@ class TaskRunner:
                 if self.output['type'] == "mongodb":
                     from pymongo import MongoClient
                     client = MongoClient(self.output['host'], int(self.output['port']))
+
                     db = client[self.output['database']]
+                    if self.config.has_option('output', 'username'):
+                        db.authenticate(self.config.get('output', 'username'), self.config.get('output', 'password'))
                     col = db[self.output['collection']]
                     result['shot'] = shot
                     col.update_one(
