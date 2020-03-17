@@ -24,7 +24,7 @@ class JTEXTDataExporter:
         self.exporter = Exporter(self.hdf5path)
         self.reader = Reader(self.hdf5path)
         # log
-        log_dir = os.path.abspath('..') + os.sep + 'log'
+        log_dir = os.path.abspath('') + os.sep + 'log'
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         self.logger = logging.getLogger(__name__)
@@ -95,10 +95,7 @@ class JTEXTDataExporter:
 
 
 if __name__ == '__main__':
-    shots = []
-    with open('shots.txt', 'r') as f:
-        for i in f.readlines():
-            shots.append(int(i))
+    shots = range(1062000, 1066000)
     tags = [r'\Bt', r'\Ihfp', r'\Ivfp', r'\MA_POL_CA01T', r'\MA_POL_CA02T', r'\MA_POL_CA03T', r'\MA_POL_CA05T', r'\MA_POL_CA06T', r'\MA_POL_CA07T', r'\MA_POL_CA19T', r'\MA_POL_CA20T', r'\MA_POL_CA21T', r'\MA_POL_CA22T', r'\MA_POL_CA23T', r'\MA_POL_CA24T', r'\axuv_ca_01', r'\ip', r'\sxr_cb_024', r'\sxr_cc_049', r'\vs_c3_aa001', r'\vs_ha_aa001']
     jdi = JTEXTDataExporter()
     jdi.download(shots, tags)
