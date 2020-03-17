@@ -1,4 +1,3 @@
-
 # 破裂数据库(Disruption database)说明
 
 ## 包结构
@@ -90,7 +89,7 @@ collection = tags2019
 在初始化的时候,读取配置文件,再import配置里面plugins里的包名,调用其接口进行计算.该类调用计算类的requested_signal获取所需诊断,使用Data类的接口读取数据之后,调用计算类的run计算.
 得到的结果显示方式在配置文件里配置,[output]的type=stdio时直接打印到标准输入输出,为mongodb时存储到mongodb,mongodb的参数在配置文件中指定.
 
-## Label
+## Data
 
 ### 1.Exporter
 该类用于将诊断写入hdf5,初始化参数是hdf5存放的根目录.提供一个借口save(data, time, shot, tag)
