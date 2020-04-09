@@ -30,7 +30,7 @@ DDB
 本项目使用python 3.x开发, 推荐使用Anaconda. 项目依赖hdf5和MongoDB的python包, 使用如下命令安装:
 
 ```shell script
-pip install pyh5
+pip install h5py
 pip install pymongo
 ```
 
