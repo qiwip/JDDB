@@ -3,20 +3,12 @@ from MDSplus import connection
 import numpy as np
 from scipy import signal
 import logging
-import platform
 import traceback
 import os
 import time
-import DDB
-import json
 
 
 class JTEXTDataExporter:
-    if platform.system() == 'Windows':
-        hdf5path = r'C:\J-TEXT'
-    else:
-        hdf5path = r'~/J-TEXT'
-
     def __init__(self, root=None):
         """connect to mdsplus server and init data importer"""
         if root:
@@ -41,7 +33,7 @@ class JTEXTDataExporter:
         self.logger.addHandler(handler)
         self.logger.addHandler(console)
 
-    def download(self, shots=None, tags=None, sr=None):
+    def download(self, shots=None, tags=None, sample_rate=None):
         """Download J-TEXT data
         @:param shots: shot list
         @:param tags: tag list
@@ -75,8 +67,8 @@ class JTEXTDataExporter:
                                 time = time[:data.shape[0]]
                             sr0 = int(len(data) / (time[-1] - time[0]) / 10) * 10
 
-                            if sr and sr < sr0/100:
-                                num = sr*(int(round(time[-1]*1000 - time[0]*1000)))
+                            if sample_rate and sample_rate < sr0/100:
+                                num = sample_rate * (int(round(time[-1] * 1000 - time[0] * 1000)))
                                 data = signal.resample(data, num)
                                 duration = (time[-1] - time[0]) / num
                                 time = []
