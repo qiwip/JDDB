@@ -137,7 +137,7 @@ from DDB.Data import Exporter
 exporter = Exporter(root_path='D:\\J-TEXT')
 data = [0.1, 0.5, 0.3, 0.4, 0.2]
 time = [0, 0.1, 0.2, 0.3, 0.4]
-exporter.save(data, time, 1051234, '\\ip')
+exporter.save(1051234,'\\ip',data,time)
 ```
 ### 2.Reader
 该类用于读取诊断,初始化参数是hdf5存放的根目录.

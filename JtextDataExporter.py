@@ -20,9 +20,11 @@ class JTEXTDataExporter:
     def __init__(self, root=None):
         """connect to mdsplus server and init data importer"""
         if root:
-            self.hdf5path = root
-        self.exporter = Exporter(self.hdf5path)
-        self.reader = Reader(self.hdf5path)
+            self.exporter = Exporter(root)
+            self.reader = Reader(root)
+        else:
+            self.exporter = Exporter()
+            self.reader = Reader()
         # log
         log_dir = os.path.abspath('') + os.sep + 'log'
         if not os.path.exists(log_dir):
@@ -80,12 +82,20 @@ class JTEXTDataExporter:
                                 time = []
                                 for i in range(num):
                                     time.append(i*duration)
-                            self.exporter.save(data, time, shot, tag)
-                            self.logger.info('shot:{}, tag:{}, Finish.'.format(shot, tag))
+                            result = self.exporter.save(shot, tag, data, time)
+                            if result == 0:
+                                self.logger.info('shot:{}, tag:{}, Finish.'.format(shot, tag))
+                            elif result == -1:
+                                self.logger.info('shot:{}, tag:{}, already exits.'.format(shot, tag))
                     except Exception as e:
                         self.logger.info('shot:{}, tag:{}, error occurs:{}\n{}.'.
                                          format(shot, tag, e, traceback.format_exc()))
-                        self.exporter.save([], [], shot, tag)
+                        result = self.exporter.save(shot, tag, [], [])
+
+                        if result == 0:
+                            self.logger.info('shot:{}, tag:{}, Finish.'.format(shot, tag))
+                        elif result == -1:
+                            self.logger.info('shot:{}, tag:{}, already exits.'.format(shot, tag))
                 c.closeTree('jtext', shot=shot)
             except Exception as err:
                 self.logger.info('shot {} is Empty, reason: {}\n{}'.format(shot, err, traceback.format_exc()))
@@ -95,7 +105,7 @@ class JTEXTDataExporter:
 
 
 if __name__ == '__main__':
-    shots = range(1062000, 1066000)
-    tags = [r'\Bt', r'\Ihfp', r'\Ivfp', r'\MA_POL_CA01T', r'\MA_POL_CA02T', r'\MA_POL_CA03T', r'\MA_POL_CA05T', r'\MA_POL_CA06T', r'\MA_POL_CA07T', r'\MA_POL_CA19T', r'\MA_POL_CA20T', r'\MA_POL_CA21T', r'\MA_POL_CA22T', r'\MA_POL_CA23T', r'\MA_POL_CA24T', r'\axuv_ca_01', r'\ip', r'\sxr_cb_024', r'\sxr_cc_049', r'\vs_c3_aa001', r'\vs_ha_aa001']
-    jdi = JTEXTDataExporter()
+    shots = [i for i in range(1064200, 1066650)]
+    tags = [r'\POLARIS_DEN_V09', r'\Iohp', r'\MA_POL2_R01', r'\MA_POL2_R25', r'\MA_TOR1_R01', r'\MA_TOR1_R09']
+    jdi = JTEXTDataExporter('/nas/hdf5_new')
     jdi.download(shots, tags)
