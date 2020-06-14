@@ -1,4 +1,4 @@
-from DDB.Data import Exporter, Reader
+import sys
 from MDSplus import connection
 import numpy as np
 from scipy import signal
@@ -6,6 +6,10 @@ import logging
 import traceback
 import os
 import time
+
+
+sys.path.append('..')
+from DDB.Data import Exporter, Reader
 
 
 class JTEXTDataExporter:
@@ -24,7 +28,7 @@ class JTEXTDataExporter:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(level=logging.INFO)
         handler = logging.FileHandler(log_dir + os.sep + 'JTEXTDataExporter_log_{}.txt'.format(
-            time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))))
+            time.strftime("%Y_%m_%d %H:%M:%S", time.localtime(time.time()))))
         handler.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
@@ -53,7 +57,9 @@ class JTEXTDataExporter:
                 c.openTree('jtext', shot=shot)
                 for tag in tags:
                     try:
-                        print('read {}:{}'.format(shot, tag))
+                        if tag in self.reader.tags(shot):
+                            self.logger.info('shot:{}, tag:{}, already exits.'.format(shot, tag))
+                            continue
                         data = np.array(c.get(tag))
                         time = np.array(c.get(r'DIM_OF(BUILD_PATH({}))'.format(tag)))
                         if data.shape[0] == 0 or time.shape[0] == 0:
@@ -80,15 +86,10 @@ class JTEXTDataExporter:
                             elif result == -1:
                                 self.logger.info('shot:{}, tag:{}, already exits.'.format(shot, tag))
                     except Exception as e:
-                        self.logger.info('shot:{}, tag:{}, error occurs:{}\n{}.'.
-                                         format(shot, tag, e, traceback.format_exc()))
-                        result = self.exporter.save(shot, tag, [], [])
-
-                        if result == 0:
-                            self.logger.info('shot:{}, tag:{}, Finish.'.format(shot, tag))
-                        elif result == -1:
-                            self.logger.info('shot:{}, tag:{}, already exits.'.format(shot, tag))
+                        self.logger.info('shot:{}, tag:{}, error occurs:{}.'.
+                                         format(shot, tag, e))
                 c.closeTree('jtext', shot=shot)
+                c.disconnect()
             except Exception as err:
                 self.logger.info('shot {} is Empty, reason: {}\n{}'.format(shot, err, traceback.format_exc()))
                 if 'SS-W-SUCCESS' in '{}'.format(err):
@@ -97,7 +98,7 @@ class JTEXTDataExporter:
 
 
 if __name__ == '__main__':
-    shots = [i for i in range(1064200, 1066650)]
-    tags = [r'\POLARIS_DEN_V09', r'\Iohp', r'\MA_POL2_R01', r'\MA_POL2_R25', r'\MA_TOR1_R01', r'\MA_TOR1_R09']
-    jdi = JTEXTDataExporter('/nas/hdf5_new')
+    shots = [i for i in range(1064035, 1066650)]
+    tags = ["\\ip", "\\Bt", "\\POLARIS_Den_v09", "\\lin_den_ch06", "\\axuv_ca_01", "\\vs_c3_aa001", "\\vs_ha_aa001", "\\sxr_cb_024", "\\sxr_cc_049", "\\Iohp", "\\Ivfp", "\\Ihfp", "\\MA_POL_CA01T", "\\MA_TOR1_R01", "\\MA_TOR1_R09"]
+    jdi = JTEXTDataExporter('/nas/hdf5')
     jdi.download(shots, tags)

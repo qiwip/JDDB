@@ -96,11 +96,13 @@ class Reader:
         try:
             path = str(math.floor(shot / 100) * 100)
             file_path = self.hdf5path + os.sep + path + os.sep + '{}.hdf5'.format(shot)
+            if not os.path.exists(file_path):
+                return []
             h5f = h5py.File(file_path, 'r')
             return [i for i in h5f.keys()]
         except Exception as e:
             print(e)
-        return []
+            return []
 
     def read_one(self, shot: int, tag: str):
         """Read data from hdf5 files
